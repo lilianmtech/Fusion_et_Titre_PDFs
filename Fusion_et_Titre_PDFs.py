@@ -70,7 +70,7 @@ def main():
         Titre_2 = ''
     else :
         Titre_2 = selection3
-        elif selection1 == "Sans" and selection2 !="Sans":
+        if selection1 == "Sans" and selection2 !="Sans":
             Titre_2 = '. ' + Titre_2
         else:
             Titre_2 = ' : ' + Titre_2
@@ -117,7 +117,7 @@ def main():
                 
                 if selection3 == "Titre existant du PDF":
                     Titre_2 = uploaded_file.name[:-4]
-                    elif selection1 == "Sans" and selection2 !="Sans":
+                    if selection1 == "Sans" and selection2 !="Sans":
                         Titre_2 = '. ' + Titre_2
                     else:
                         Titre_2 = ' : ' + Titre_2
@@ -145,5 +145,6 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
