@@ -5,12 +5,20 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 import tempfile
 import io
+import re
 
+def key(x):
+    var_nb = re.findall('\d+', x.name)
+    if len(var_nb) ==0:
+        var_nb = [0]
+    print(var_nb)
+    return int(var_nb[0])
+        
 def add_watermark(input_pdf, watermark_source, Police, color, transparency, scale, Hauteur, Largeur):
     
     watermark_pdf = io.BytesIO()
     c = canvas.Canvas(watermark_pdf, pagesize=A4)
-    c.setFillAlpha(transparency)  # Set transparency
+    c.setFillAlpha(transparency)
     c.setFont(Police, scale)
     c.setFillColorRGB(color[0]/255,color[1]/255,color[2]/255)
     c.drawString(Largeur * cm, (29.7-Hauteur) * cm, watermark_source)
@@ -42,10 +50,19 @@ def hex_to_rgb(value):
 def main():
     st.title("📚 Fusion et Titre PDFs")
 
-    uploaded_files = st.file_uploader("🚨 Importer les PDFs dans l'ordre (1er = ANNEXE A, 2ème = ANNEXE B, ...)", accept_multiple_files=True, type="pdf")
-    st.markdown("### ✍🏻Format")
+    uploaded_files = st.file_uploader("", accept_multiple_files=True, type="pdf")
+    Classement = ["Par ordre d'importation"] + ["Par ordre alphabétique"] + ["Par ordre numérique"]
+    selection0 = st.selectbox("Classement", options=Classement)
     
-   
+    if selection0 == "Par ordre d'importation":
+        Info_ordre = "1ère import = 1er doc, 2ème import = 2ème doc, ..."
+    elif selection0 == "Par ordre alphabétique":
+        Info_ordre = "En fonction du titre du PDF : 1)A15.pdf 2)G2.pdf 3)M9.pdf"
+    elif selection0 == "Par ordre numérique":
+        Info_ordre = "En fonction du titre du PDF : 1)G2.pdf 2)M9.pdf 3)A15.pdf"
+    st.info(f"{Info_ordre}",icon="ℹ")
+    
+    st.markdown("### ✍🏻Format")
     
     Titre1 = ["Annexe"] + ["Autre Titre"] + ["Sans"]
     selection1 = st.selectbox("Selection du Titre_1", options=Titre1)
@@ -106,9 +123,19 @@ def main():
     
     i = 0
     if st.button("⚡ Lancer"):
+
         if uploaded_files :
+            if selection0 == "Par ordre alphabétique":
+                UFs = sorted(uploaded_files, key=lambda uploaded_files: uploaded_files.name)
+                print(UFs[0].name, 'A')
+            elif selection0 == "Par ordre numérique":
+                UFs = sorted(uploaded_files, key=key)
+                print(UFs[0].name, 'N')
+            else:
+                UFs = uploaded_files
+                print(UFs[0].name, 'O')  
             merged_pdf = PdfWriter()
-            for uploaded_file in uploaded_files:
+            for uploaded_file in UFs:
                 print(uploaded_file.name[:-4])
                 
                 if selection2 == "A,B,C,..":
@@ -151,6 +178,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
