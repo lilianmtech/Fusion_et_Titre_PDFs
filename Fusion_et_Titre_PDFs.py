@@ -76,11 +76,11 @@ def main():
             Titre_2 = ' : ' + Titre_2
     
     if selection2 == "A,B,C,..":
-        Increment = ' A '
+        Increment = ' A'
     elif selection2 == "1,2,3,..":
-        Increment = ' 1 '
+        Increment = ' 1'
     elif selection2 == "Sans": 
-        Increment = ' '
+        Increment = ''
     
     selection = Titre_1 + Increment + Titre_2
     
@@ -114,7 +114,7 @@ def main():
                 elif selection2 == "1,2,3,..":
                     nb = str(i+1)
                     Increm = str(' '+nb)
-                else
+                else:
                     Increm = ''
                 
                 if selection3 == "Titre existant du PDF":
@@ -147,6 +147,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
