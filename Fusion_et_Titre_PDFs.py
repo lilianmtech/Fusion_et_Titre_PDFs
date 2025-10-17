@@ -72,7 +72,7 @@ def main():
         Titre_2 = selection3
         if selection1 == "Sans" and selection2 !="Sans":
             Titre_2 = '. ' + Titre_2
-        else:
+        elif selection1 != "Sans" and selection2 =="Sans" :
             Titre_2 = ' : ' + Titre_2
     
     if selection2 == "A,B,C,..":
@@ -121,7 +121,7 @@ def main():
                     Titre_2 = uploaded_file.name[:-4]
                     if selection1 == "Sans" and selection2 !="Sans":
                         Titre_2 = '. ' + Titre_2
-                    else:
+                    elif selection1 != "Sans" and selection2 =="Sans" :
                         Titre_2 = ' : ' + Titre_2
                          
                 name = Titre_1 + Increm + Titre_2 
@@ -147,6 +147,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
