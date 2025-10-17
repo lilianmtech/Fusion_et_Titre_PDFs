@@ -8,7 +8,6 @@ import io
 
 def add_watermark(input_pdf, watermark_source, Police, color, transparency, scale, Hauteur, Largeur):
     
-    # Create a watermark PDF with the given image
     watermark_pdf = io.BytesIO()
     c = canvas.Canvas(watermark_pdf, pagesize=A4)
     c.setFillAlpha(transparency)  # Set transparency
@@ -19,18 +18,16 @@ def add_watermark(input_pdf, watermark_source, Police, color, transparency, scal
     c.save()
     watermark_pdf.seek(0)
     
-    # Read the input PDF
+
     input_pdf = PdfReader(input_pdf)
     watermark_pdf = PdfReader(watermark_pdf)
     output_pdf = PdfWriter()
     
-    # Add the watermark to each page
     for i in range(len(input_pdf.pages)):
         page = input_pdf.pages[i]
         page.merge_page(watermark_pdf.pages[0])
         output_pdf.add_page(page)
     
-    # Write the watermarked PDF to a BytesIO object
     output_pdf_stream = io.BytesIO()
     output_pdf.write(output_pdf_stream)
     output_pdf_stream.seek(0)
@@ -73,6 +70,12 @@ def main():
         Titre_2 = ''
     else :
         Titre_2 = selection3
+        if selection1 != "Sans" and selection2 !="Sans":
+            Titre_2 = '. : ' + Titre_2
+        elif selection1 == "Sans" and selection2 !="Sans":
+            Titre_2 = '. ' + Titre_2
+        elif selection1 != "Sans" and selection2 =="Sans":
+            Titre_2 = ' : ' + Titre_2
     
     if selection2 == "A,B,C,..":
         Increment = ' A '
@@ -109,16 +112,20 @@ def main():
                 print(uploaded_file.name[:-4])
                 
                 if selection2 == "A,B,C,..":
-                    Increm = str(' '+chaine[i]+' ')
+                    Increm = str(' '+chaine[i])
                 elif selection2 == "1,2,3,..":
                     nb = str(i+1)
-                    Increm = str(' '+nb+' ')
-                elif selection2 == "Sans": 
-                    Increm = ' ' 
+                    Increm = str(' '+nb)
                 
                 if selection3 == "Titre existant du PDF":
                     Titre_2 = uploaded_file.name[:-4]
-                    
+                    if selection1 != "Sans" and selection2 !="Sans":
+                        Titre_2 = '. : ' + Titre_2
+                    elif selection1 == "Sans" and selection2 !="Sans":
+                        Titre_2 = '. ' + Titre_2
+                    elif selection1 != "Sans" and selection2 =="Sans":
+                        Titre_2 = ' : ' + Titre_2
+                         
                 name = Titre_1 + Increm + Titre_2 
                 
                 watermarked_pdf = add_watermark(uploaded_file, name, Police, color, transparency, scale, Hauteur, Largeur)
@@ -142,3 +149,4 @@ def main():
 if __name__ == "__main__":
 
     main()
+
