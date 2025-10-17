@@ -114,6 +114,8 @@ def main():
                 elif selection2 == "1,2,3,..":
                     nb = str(i+1)
                     Increm = str(' '+nb)
+                else
+                    Increm = ''
                 
                 if selection3 == "Titre existant du PDF":
                     Titre_2 = uploaded_file.name[:-4]
@@ -145,6 +147,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
