@@ -102,7 +102,7 @@ def main():
     transparency = st.slider("Transparence", 0.0, 1.0, 1.0)
     
     i = 0
-    if st.button("⚡ RUN ⚡"):
+    if st.button("⚡ Lancer"):
         if uploaded_files :
             merged_pdf = PdfWriter()
             for uploaded_file in uploaded_files:
@@ -140,4 +140,5 @@ def main():
         )
             
 if __name__ == "__main__":
+
     main()
