@@ -55,18 +55,21 @@ def main():
     selection0 = st.selectbox("Classement", options=Classement)
     
     if selection0 == "Par ordre d'importation":
-        Info_ordre = "1ère import = 1er doc, 2ème import = 2ème doc, ..."
+        Info_ordre = '''En fonction du titre du PDF :   
+        1) 1ère import  
+        2 )2ème import
+        3) 3ème import'''
     elif selection0 == "Par ordre alphabétique":
-        st.markdown('''ℹ En fonction du titre du PDF :   
-        1)A15.pdf  
-        2)G2.pdf  
-        3)M9.pdf''')
+        Info_ordre ='''En fonction du titre du PDF :   
+        1) A15.pdf  
+        2 )G2.pdf  
+        3) M9.pdf'''
     elif selection0 == "Par ordre numérique":
-        st.markdown('''En fonction du nombre présent dans le titre du PDF :  
-        1)G2.pdf  
-        2)M9.pdf   
-        3)A15.pdf''')
-    st.info()
+        Info_ordre ='''En fonction du nombre présent dans le titre du PDF :  
+        1) G2.pdf  
+        2) M9.pdf   
+        3) A15.pdf'''
+    st.info(Info_ordre,icon='ℹ')
     
     st.markdown("### ✍🏻Format")
     
@@ -184,6 +187,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
