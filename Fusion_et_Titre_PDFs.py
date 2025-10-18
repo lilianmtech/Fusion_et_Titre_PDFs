@@ -62,11 +62,8 @@ def main():
         2)G2.pdf 
         3)M9.pdf''')
     elif selection0 == "Par ordre numérique":
-        st.markdown'''En fonction du nombre présent dans le titre du PDF : 
-        1)G2.pdf 
-        2)M9.pdf 
-        3)A15.pdf''')
-
+        st.markdown('''En fonction du nombre présent dans le titre du PDF :  1)G2.pdf  2)M9.pdf   3)A15.pdf''')
+    st.info()
     
     st.markdown("### ✍🏻Format")
     
@@ -184,6 +181,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
