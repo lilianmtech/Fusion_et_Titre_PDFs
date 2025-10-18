@@ -59,8 +59,8 @@ def main():
     elif selection0 == "Par ordre alphabétique":
         Info_ordre = "En fonction du titre du PDF : 1)A15.pdf 2)G2.pdf 3)M9.pdf"
     elif selection0 == "Par ordre numérique":
-        Info_ordre = "En fonction du titre du PDF : 1)G2.pdf 2)M9.pdf 3)A15.pdf"
-    st.info(f"{Info_ordre}",icon="ℹ")
+        Info_ordre = "En fonction du nombre présent dans le titre du PDF : 1)G2.pdf 2)M9.pdf 3)A15.pdf"
+    st.info(Info_ordre,icon="ℹ")
     
     st.markdown("### ✍🏻Format")
     
@@ -168,16 +168,17 @@ def main():
             watermarked_pdf_stream = add_watermark(temp_merged_pdf.name, '', Police, color, 0.0, scale, Hauteur, Largeur)
             
             
-        st.download_button(
-            label="✔️ Télécharger",
-            data=watermarked_pdf_stream,
-            file_name="Annexe.pdf",
-            mime="application/pdf"
-        )
+            st.download_button(
+                label="✔️ Télécharger",
+                data=watermarked_pdf_stream,
+                file_name="Annexe.pdf",
+                mime="application/pdf"
+            )
             
 if __name__ == "__main__":
 
     main()
+
 
 
 
