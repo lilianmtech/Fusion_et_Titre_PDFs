@@ -57,16 +57,16 @@ def main():
     if selection0 == "Par ordre d'importation":
         Info_ordre = "1ère import = 1er doc, 2ème import = 2ème doc, ..."
     elif selection0 == "Par ordre alphabétique":
-        Info_ordre = '''En fonction du titre du PDF : 
+        st.info(Info_ordre = '''En fonction du titre du PDF : 
         1)A15.pdf 
         2)G2.pdf 
-        3)M9.pdf'''
+        3)M9.pdf''', icon="ℹ")
     elif selection0 == "Par ordre numérique":
-        Info_ordre = '''En fonction du nombre présent dans le titre du PDF : 
+        st.info(Info_ordre = '''En fonction du nombre présent dans le titre du PDF : 
         1)G2.pdf 
         2)M9.pdf 
-        3)A15.pdf'''
-    st.info(Info_ordre,icon="ℹ")
+        3)A15.pdf''')
+
     
     st.markdown("### ✍🏻Format")
     
@@ -184,6 +184,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
