@@ -57,7 +57,7 @@ def main():
     if selection0 == "Par ordre d'importation":
         Info_ordre = '''En fonction du titre du PDF :   
         1) 1ère import  
-        2 )2ème import  
+        2) 2ème import  
         3) 3ème import'''
     elif selection0 == "Par ordre alphabétique":
         Info_ordre ='''En fonction du titre du PDF :   
@@ -187,6 +187,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
