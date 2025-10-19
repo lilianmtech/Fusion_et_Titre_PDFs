@@ -55,7 +55,7 @@ def main():
     selection0 = st.selectbox("Classement", options=Classement)
     
     if selection0 == "Par ordre d'importation":
-        Info_ordre = '''En fonction du titre du PDF :   
+        Info_ordre = '''Par ordre d'importation :   
         1) 1er import  
         2) 2ème import  
         3) 3ème import'''
@@ -187,6 +187,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
