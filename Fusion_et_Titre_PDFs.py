@@ -14,33 +14,38 @@ def key(x):
     print(var_nb)
     return int(var_nb[0])
         
-def add_watermark(input_pdf, watermark_source, Police, color, transparency, scale, Hauteur, Largeur):
-    
-    watermark_pdf = io.BytesIO()
-    c = canvas.Canvas(watermark_pdf, pagesize=A4)
-    c.setFillAlpha(transparency)
-    c.setFont(Police, scale)
-    c.setFillColorRGB(color[0]/255,color[1]/255,color[2]/255)
-    c.drawString(Largeur * cm, (29.7-Hauteur) * cm, watermark_source)
+def Ajout_Titre(input_pdf, watermark_source, Police, color, transparency, scale, pos_y, pos_x):
+    reader = PdfReader(io.BytesIO(input_pdf))
+    writer = PdfWriter()
 
-    c.save()
-    watermark_pdf.seek(0)
-    
+    for page in reader.pages:
+        # Dimensions de la page
+        largeur = float(page.mediabox.width)
+        hauteur = float(page.mediabox.height)
 
-    input_pdf = PdfReader(input_pdf)
-    watermark_pdf = PdfReader(watermark_pdf)
-    output_pdf = PdfWriter()
-    
-    for i in range(len(input_pdf.pages)):
-        page = input_pdf.pages[i]
-        page.merge_page(watermark_pdf.pages[0])
-        output_pdf.add_page(page)
-    
-    output_pdf_stream = io.BytesIO()
-    output_pdf.write(output_pdf_stream)
-    output_pdf_stream.seek(0)
-    
-    return output_pdf_stream
+        # Créer un calque temporaire avec "Annexe"
+        packet = io.BytesIO()
+        c = canvas.Canvas(packet, pagesize=(largeur, hauteur))
+        
+        # Position du texte selon valeurs normalisées 0–1
+        x = pos_x * largeur
+        y = pos_y * hauteur
+        c.setFillAlpha(transparency)
+        c.setFont(Police, scale)
+        c.setFillColorRGB(color[0]/255,color[1]/255,color[2]/255)
+        c.drawCentredString(x, y, watermark_source)
+        c.save()
+
+        # Fusionner la page originale avec le texte
+        packet.seek(0)
+        watermark = PdfReader(packet)
+        page.merge_page(watermark.pages[0])
+        writer.add_page(page)
+
+    output = io.BytesIO()
+    writer.write(output)
+    output.seek(0)
+    return output
 
 def hex_to_rgb(value):
     value = value.lstrip('#')
@@ -54,22 +59,29 @@ def main():
     Classement = ["Par ordre d'importation"] + ["Par ordre alphabétique"] + ["Par ordre numérique"]
     selection0 = st.selectbox("Classement", options=Classement)
     
-    if selection0 == "Par ordre d'importation":
-        Info_ordre = '''Par ordre d'importation :   
-        1) 1er import  
-        2) 2ème import  
-        3) 3ème import'''
+    if selection0 == "Par ordre d'importation" and uploaded_files:
+        filenames = [f.name for f in uploaded_files]
+        st.write("Vous pouvez réorganiser les fichiers :")
+        # Interface de tri
+        order = st.data_editor(
+            [{"Ordre": i+1, "Fichier": name} for i, name in enumerate(filenames)],
+            num_rows="fixed",
+            use_container_width=True,
+            key="order_editor"
+        )
+        ordered_files = [row["Fichier"] for row in sorted(order, key=lambda x: x["Ordre"])]
     elif selection0 == "Par ordre alphabétique":
         Info_ordre ='''En fonction du titre du PDF :   
         1) A15.pdf  
         2 )G2.pdf  
         3) M9.pdf'''
+        st.info(Info_ordre,icon='ℹ')
     elif selection0 == "Par ordre numérique":
         Info_ordre ='''En fonction du nombre présent dans le titre du PDF :  
         1) G2.pdf  
         2) M9.pdf   
         3) A15.pdf'''
-    st.info(Info_ordre,icon='ℹ')
+        st.info(Info_ordre,icon='ℹ')
     
     st.markdown("### ✍🏻Format")
     
@@ -112,12 +124,13 @@ def main():
     
     selection = Titre_1 + Increment + Titre_2
     
-    st.info(selection,icon="📟")
+    st.info(f"{selection}",icon="📟")
 
     
     st.markdown("### 📏Position")
-    Hauteur = st.slider("↕️ Hauteur (Partant du haut) 0 à 29,7cm", 0.0, 29.7, 0.7)
-    Largeur = st.slider("↔️ Largeur (Partant de la gauche) 0 à 21cm", 0.0, 21.0, 1.0)
+    Largeur = st.slider("↔️ Position horizontale du texte (0 = gauche, 1 = droite)", 0.0, 1.0, 0.5, 0.01)
+    Hauteur = st.slider("↕️ Position verticale du texte (0 = bas, 1 = haut)", 0.0, 1.0, 0.5, 0.01)
+    
     
     st.markdown("### 🌈Personnalisation")
     
@@ -125,10 +138,10 @@ def main():
     Police = st.selectbox("Type de police", options=P)
     
     chaine = 'ABCDEFGHIJKLMNOPQRSTUVWYXZ'
-    scale = st.slider("Taille police", 0, 50, 14)
-    hexa = st.color_picker("Couleur", "#000000")
+    scale = st.slider("Taille police", 0, 50, 30)
+    hexa = st.color_picker("Couleur", "#2F99F3")
     color = hex_to_rgb(hexa)
-    transparency = st.slider("Transparence", 0.0, 1.0, 1.0)
+    transparency = st.slider("Transparence", 0.0, 1.0, 0.3)
     
     i = 0
     if st.button("⚡ Lancer"):
@@ -136,17 +149,15 @@ def main():
         if uploaded_files :
             if selection0 == "Par ordre alphabétique":
                 UFs = sorted(uploaded_files, key=lambda uploaded_files: uploaded_files.name)
-                print(UFs[0].name, 'A')
             elif selection0 == "Par ordre numérique":
                 UFs = sorted(uploaded_files, key=key)
-                print(UFs[0].name, 'N')
             else:
-                UFs = uploaded_files
-                print(UFs[0].name, 'O')  
+                UFs=[]
+                for name in ordered_files:
+                    file = next(f for f in uploaded_files if f.name == name)
+                    UFs.append(file)  
             merged_pdf = PdfWriter()
             for uploaded_file in UFs:
-                print(uploaded_file.name[:-4])
-                
                 if selection2 == "A,B,C,..":
                     Increm = str(' '+chaine[i])
                 elif selection2 == "1,2,3,..":
@@ -166,7 +177,7 @@ def main():
                          
                 name = Titre_1 + Increm + Titre_2 
                 
-                watermarked_pdf = add_watermark(uploaded_file, name, Police, color, transparency, scale, Hauteur, Largeur)
+                watermarked_pdf = Ajout_Titre(uploaded_file.read(), name, Police, color, transparency, scale, Hauteur, Largeur)
                 reader = PdfReader(watermarked_pdf)
                 for page in reader.pages:
                     merged_pdf.add_page(page)
@@ -174,12 +185,11 @@ def main():
             temp_merged_pdf = tempfile.NamedTemporaryFile(delete=False)
             merged_pdf.write(temp_merged_pdf)
             temp_merged_pdf.close()
-            watermarked_pdf_stream = add_watermark(temp_merged_pdf.name, '', Police, color, 0.0, scale, Hauteur, Largeur)
             
-            
+        with open(temp_merged_pdf.name, "rb") as f:    
             st.download_button(
                 label="✔️ Télécharger",
-                data=watermarked_pdf_stream,
+                data=f,
                 file_name="Annexe.pdf",
                 mime="application/pdf"
             )
@@ -187,6 +197,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
