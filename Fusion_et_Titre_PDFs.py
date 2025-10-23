@@ -194,13 +194,14 @@ def main():
             st.download_button(
                 label="✔️ Télécharger",
                 data=f,
-                file_name="Annexe.pdf",
+                file_name=Name_end + ".pdf",
                 mime="application/pdf"
             )
             
 if __name__ == "__main__":
 
     main()
+
 
 
 
