@@ -8,7 +8,7 @@ import io
 import re
 
 def key(x):
-    var_nb = re.findall('\d+', x.name)
+    var_nb = re.findall('\d+', x)
     if len(var_nb) ==0:
         var_nb = [0]
     print(var_nb)
@@ -58,9 +58,9 @@ def main():
     uploaded_files = st.file_uploader("", accept_multiple_files=True, type="pdf")
     Classement = ["Par ordre d'importation"] + ["Par ordre alphabétique"] + ["Par ordre numérique"]
     selection0 = st.selectbox("Classement", options=Classement)
+    filenames = [f.name for f in uploaded_files]
     
     if selection0 == "Par ordre d'importation" and uploaded_files:
-        filenames = [f.name for f in uploaded_files]
         st.write("Vous pouvez réorganiser les fichiers :")
         # Interface de tri
         order = st.data_editor(
@@ -70,18 +70,28 @@ def main():
             key="order_editor"
         )
         ordered_files = [row["Fichier"] for row in sorted(order, key=lambda x: x["Ordre"])]
+        
     elif selection0 == "Par ordre alphabétique":
-        Info_ordre ='''En fonction du titre du PDF :   
-        1) A15.pdf  
-        2 )G2.pdf  
-        3) M9.pdf'''
-        st.info(Info_ordre,icon='ℹ')
+         st.write("Vous pouvez réorganiser les fichiers :")
+         filenames=sorted(filenames)
+         order = st.data_editor(
+            [{"Ordre": i+1, "Fichier": name} for i, name in enumerate(filenames)],
+            num_rows="fixed",
+            use_container_width=True,
+            key="order_editor"
+        )
+         ordered_files = [row["Fichier"] for row in sorted(order, key=lambda x: x["Ordre"])]
+
     elif selection0 == "Par ordre numérique":
-        Info_ordre ='''En fonction du nombre présent dans le titre du PDF :  
-        1) G2.pdf  
-        2) M9.pdf   
-        3) A15.pdf'''
-        st.info(Info_ordre,icon='ℹ')
+         st.write("Vous pouvez réorganiser les fichiers :")
+         filenames=sorted(filenames, key=key)
+         order = st.data_editor(
+            [{"Ordre": i+1, "Fichier": name} for i, name in enumerate(filenames)],
+            num_rows="fixed",
+            use_container_width=True,
+            key="order_editor"
+        )
+         ordered_files = [row["Fichier"] for row in sorted(order, key=lambda x: x["Ordre"])]
     
     st.markdown("### ✍🏻Format")
     
@@ -142,20 +152,14 @@ def main():
     hexa = st.color_picker("Couleur", "#2F99F3")
     color = hex_to_rgb(hexa)
     transparency = st.slider("Transparence", 0.0, 1.0, 0.3)
-    
+    Name_end = st.text_input('Nom du PDF en sortie :', value="Fusion_et_Titre_PDFs") 
     i = 0
     if st.button("⚡ Lancer"):
-
         if uploaded_files :
-            if selection0 == "Par ordre alphabétique":
-                UFs = sorted(uploaded_files, key=lambda uploaded_files: uploaded_files.name)
-            elif selection0 == "Par ordre numérique":
-                UFs = sorted(uploaded_files, key=key)
-            else:
-                UFs=[]
-                for name in ordered_files:
-                    file = next(f for f in uploaded_files if f.name == name)
-                    UFs.append(file)  
+            UFs=[]
+            for name in ordered_files:
+                file = next(f for f in uploaded_files if f.name == name)
+                UFs.append(file)  
             merged_pdf = PdfWriter()
             for uploaded_file in UFs:
                 if selection2 == "A,B,C,..":
@@ -197,6 +201,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
