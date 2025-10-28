@@ -15,7 +15,7 @@ def key(x):
     return int(var_nb[0])
         
 def Ajout_Titre(input_pdf, watermark_source, Police, color, transparency, scale, pos_y, pos_x):
-    reader = PdfReader(io.BytesIO(input_pdf))
+    reader = PdfReader(input_pdf)
     writer = PdfWriter()
 
     for page in reader.pages:
@@ -219,6 +219,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
