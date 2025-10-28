@@ -198,7 +198,7 @@ def main():
                             Titre_2 = ' : ' + Titre_2
                              
                     name = Titre_1 + Increm + Titre_2 
-                    file = add_watermark(file, name, Police, color, transparency, scale, Hauteur, Largeur)
+                    file = Ajout_Titre(file, name, Police, color, transparency, scale, Hauteur, Largeur)
                     i = i+1
                 merger.append(file)
 
@@ -219,6 +219,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
