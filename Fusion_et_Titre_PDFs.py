@@ -1,5 +1,5 @@
 import streamlit as st
-from PyPDF2 import PdfWriter, PdfReader
+from PyPDF2 import PdfWriter, PdfReader, PdfMerger
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
@@ -63,35 +63,55 @@ def main():
     if selection0 == "Par ordre d'importation" and uploaded_files:
         st.write("Vous pouvez réorganiser les fichiers :")
         # Interface de tri
-        order = st.data_editor(
-            [{"Ordre": i+1, "Fichier": name} for i, name in enumerate(filenames)],
+        table_data = [
+            {"Ordre": i + 1, "Fichier": name, "Titre": True}
+            for i, name in enumerate(filenames)
+        ]
+
+        edited_table = st.data_editor(
+            table_data,
             num_rows="fixed",
             use_container_width=True,
-            key="order_editor"
+            key="file_table"
         )
-        ordered_files = [row["Fichier"] for row in sorted(order, key=lambda x: x["Ordre"])]
+        sorted_rows = sorted(edited_table, key=lambda x: x["Ordre"])
         
     elif selection0 == "Par ordre alphabétique":
          st.write("Vous pouvez réorganiser les fichiers :")
          filenames=sorted(filenames)
-         order = st.data_editor(
-            [{"Ordre": i+1, "Fichier": name} for i, name in enumerate(filenames)],
+         print(filenames)
+         table_data = [
+            {"Ordre": i + 1, "Fichier": name, "Titre": True}
+            for i, name in enumerate(filenames)
+        ]
+
+         edited_table = st.data_editor(
+            table_data,
             num_rows="fixed",
             use_container_width=True,
-            key="order_editor"
+            key="file_table"
         )
-         ordered_files = [row["Fichier"] for row in sorted(order, key=lambda x: x["Ordre"])]
+         sorted_rows = sorted(edited_table, key=lambda x: x["Ordre"])
+
+    # Tri par ordre choisi
+
 
     elif selection0 == "Par ordre numérique":
          st.write("Vous pouvez réorganiser les fichiers :")
          filenames=sorted(filenames, key=key)
-         order = st.data_editor(
-            [{"Ordre": i+1, "Fichier": name} for i, name in enumerate(filenames)],
+         print(filenames)
+         table_data = [
+            {"Ordre": i + 1, "Fichier": name, "Titre": True}
+            for i, name in enumerate(filenames)
+        ]
+
+         edited_table = st.data_editor(
+            table_data,
             num_rows="fixed",
             use_container_width=True,
-            key="order_editor"
+            key="file_table"
         )
-         ordered_files = [row["Fichier"] for row in sorted(order, key=lambda x: x["Ordre"])]
+         sorted_rows = sorted(edited_table, key=lambda x: x["Ordre"])
     
     st.markdown("### ✍🏻Format")
     
@@ -156,51 +176,50 @@ def main():
     i = 0
     if st.button("⚡ Lancer"):
         if uploaded_files :
-            UFs=[]
-            for name in ordered_files:
-                file = next(f for f in uploaded_files if f.name == name)
-                UFs.append(file)  
-            merged_pdf = PdfWriter()
-            for uploaded_file in UFs:
-                if selection2 == "A,B,C,..":
-                    Increm = str(' '+chaine[i])
-                elif selection2 == "1,2,3,..":
-                    nb = str(i+1)
-                    Increm = str(' '+nb)
-                else:
-                    Increm = ''
-                
-                if selection3 == "Titre existant du PDF":
-                    Titre_2 = uploaded_file.name[:-4]
-                    if selection1 == "Sans" and selection2 !="Sans":
-                        Titre_2 = '. ' + Titre_2
-                    elif selection1 != "Sans" and selection2 =="Sans" :
-                        Titre_2 = ' : ' + Titre_2
-                    elif selection1 != "Sans" and selection2 !="Sans" :
-                        Titre_2 = ' : ' + Titre_2
-                         
-                name = Titre_1 + Increm + Titre_2 
-                
-                watermarked_pdf = Ajout_Titre(uploaded_file.read(), name, Police, color, transparency, scale, Hauteur, Largeur)
-                reader = PdfReader(watermarked_pdf)
-                for page in reader.pages:
-                    merged_pdf.add_page(page)
-                i=i+1
-            temp_merged_pdf = tempfile.NamedTemporaryFile(delete=False)
-            merged_pdf.write(temp_merged_pdf)
-            temp_merged_pdf.close()
-            
-        with open(temp_merged_pdf.name, "rb") as f:    
-            st.download_button(
-                label="✔️ Télécharger",
-                data=f,
-                file_name=Name_end + ".pdf",
-                mime="application/pdf"
-            )
+            merger = PdfMerger()
+            for row in sorted_rows:
+                file = next(f for f in uploaded_files if f.name == row["Fichier"])
+                if row["Titre"]:
+                    if selection2 == "A,B,C,..":
+                        Increm = str(' '+chaine[i])
+                    elif selection2 == "1,2,3,..":
+                        nb = str(i+1)
+                        Increm = str(' '+nb)
+                    else:
+                        Increm = ''
+                    
+                    if selection3 == "Titre existant du PDF":
+                        Titre_2 = file.name[:-4]
+                        if selection1 == "Sans" and selection2 !="Sans":
+                            Titre_2 = '. ' + Titre_2
+                        elif selection1 != "Sans" and selection2 =="Sans" :
+                            Titre_2 = ' : ' + Titre_2
+                        elif selection1 != "Sans" and selection2 !="Sans" :
+                            Titre_2 = ' : ' + Titre_2
+                             
+                    name = Titre_1 + Increm + Titre_2 
+                    file = add_watermark(file, name, Police, color, transparency, scale, Hauteur, Largeur)
+                    i = i+1
+                merger.append(file)
+
+            # Génération du fichier fusionné
+            merged_pdf = io.BytesIO()
+            merger.write(merged_pdf)
+            merger.close()
+            merged_pdf.seek(0) 
+        
+    if 'merged_pdf' in locals():   
+        st.download_button(
+            label="✔️ Télécharger",
+            data=merged_pdf,
+            file_name=Name_end + ".pdf",
+            mime="application/pdf"
+        )
             
 if __name__ == "__main__":
 
     main()
+
 
 
 
