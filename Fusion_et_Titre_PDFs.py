@@ -47,6 +47,20 @@ def Ajout_Titre(input_pdf, watermark_source, Police, color, transparency, scale,
     output.seek(0)
     return output
 
+def compress_pdf(input_pdf):
+
+    reader = PdfReader(input_pdf)
+    writer = PdfWriter()
+    
+    for page in reader.pages:
+        page.compress_content_streams()
+        writer.add_page(page)
+        
+    output = io.BytesIO()
+    writer.write(output)
+    output.seek(0)
+    return output
+
 def hex_to_rgb(value):
     value = value.lstrip('#')
     lv = len(value)
@@ -207,7 +221,8 @@ def main():
             merger.write(merged_pdf)
             merger.close()
             merged_pdf.seek(0) 
-        
+            merged_pdf = compress_pdf(merged_pdf)
+            
     if 'merged_pdf' in locals():   
         st.download_button(
             label="✔️ Télécharger",
@@ -219,6 +234,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
