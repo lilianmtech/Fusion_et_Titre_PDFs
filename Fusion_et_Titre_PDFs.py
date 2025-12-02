@@ -221,12 +221,12 @@ def main():
             merger.write(merged_pdf)
             merger.close()
             merged_pdf.seek(0) 
-            merged_pdf = compress_pdf(merged_pdf)
+            comp_pdf = compress_pdf(merged_pdf)
             
     if 'merged_pdf' in locals():   
         st.download_button(
             label="✔️ Télécharger",
-            data=merged_pdf,
+            data=comp_pdf,
             file_name=Name_end + ".pdf",
             mime="application/pdf"
         )
@@ -234,6 +234,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
